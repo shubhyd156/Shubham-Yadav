@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login / Signup</title>
+<style>
+  /* Reset and base styles */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+  }
+  .container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    width: 360px;
+    padding: 2rem;
+    position: relative;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #4a4a4a;
+  }
+  form {
+    display: none;
+    flex-direction: column;
+  }
+  form.active {
+    display: flex;
+  }
+  label {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border-color: #667eea;
+    outline: none;
+  }
+  .error-message {
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: -0.75rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  button {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #5a67d8;
+  }
+  .toggle-link {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #667eea;
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle-link:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="form-title">Login</h2>
+    <form id="login-form" class="active" novalidate>
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" name="login-email" required />
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" name="login-password" required />
+      <button type="submit">Login</button>
+    </form>
+    <form id="signup-form" novalidate>
+      <label for="signup-username">Username</label>
+      <input type="text" id="signup-username" name="signup-username" required />
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" name="signup-email" required />
+      <label for="signup-password">Password</label>
+      <input type="password" id="signup-password" name="signup-password" required />
+      <div id="password-error" class="error-message">Password must be at least 8 characters, include uppercase, lowercase, number, and special character.</div>
+      
+      <label for="signup-confirm-password">Confirm Password</label>
+      <input type="password" id="signup-confirm-password" name="signup-confirm-password" required />
+      <div id="confirm-password-error" class="error-message">Passwords do not match.</div>
+      
+      <button type="submit">Sign Up</button>
+    </form>
+    <div class="toggle-link" id="toggle-link">Don't have an account? Sign Up</div>
+  </div>
+
+<script>
+  const loginForm = document.getElementById('login-form');
+  const signupForm = document.getElementById('signup-form');
+  const toggleLink = document.getElementById('toggle-link');
+  const formTitle = document.getElementById('form-title');
+  const passwordInput = document.getElementById('signup-password');
+  const passwordError = document.getElementById('password-error');
+
+  // Toggle between login and signup forms
+  toggleLink.addEventListener('click', () => {
+    if (loginForm.classList.contains('active')) {
+      loginForm.classList.remove('active');
+      signupForm.classList.add('active');
+      formTitle.textContent = 'Sign Up';
+      toggleLink.textContent = 'Already have an account? Login';
+      passwordError.style.display = 'none';
+      passwordInput.value = '';
+    } else {
+      signupForm.classList.remove('active');
+      loginForm.classList.add('active');
+      formTitle.textContent = 'Login';
+      toggleLink.textContent = "Don't have an account? Sign Up";
+    }
+  });
+
+  // Password validation function
+  function validatePassword(password) {
+    const minLength = 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    return password.length >= minLength && hasUpper && hasLower && hasNumber && hasSpecial;
+  }
+
+  // Signup form submit handler
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('signup-email');
+    const password = passwordInput.value;
+    const confirmPasswordInput = document.getElementById('signup-confirm-password');
+    const confirmPassword = confirmPasswordInput.value;
+
+    // Email validation using HTML5 validity API
+    if (!emailInput.checkValidity()) {
+      alert('Please enter a valid email address.');
+      emailInput.focus();
+      return;
+    }
+
+    // Password validation
+    if (!validatePassword(password)) {
+      passwordError.style.display = 'block';
+      passwordInput.focus();
+      return;
+    } else {
+      passwordError.style.display = 'none';
+    }
+
+    // Confirm password validation
+    if (password !== confirmPassword) {
+      const confirmPasswordError = document.getElementById('confirm-password-error');
+      confirmPasswordError.style.display = 'block';
+      confirmPasswordInput.focus();
+      return;
+    } else {
+      const confirmPasswordError = document.getElementById('confirm-password-error');
+      confirmPasswordError.style.display = 'none';
+    }
+
+    alert('Signup successful! (This is a demo, no backend connected)');
+    signupForm.reset();
+  });
+
+  // Login form submit handler
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('Login successful! (This is a demo, no backend connected)');
+    loginForm.reset();
+  });
+</script>
+</body>
+</html>
